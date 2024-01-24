@@ -1,61 +1,97 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/axios';
-interface ProductType {
+import ProductType from 'src/types/Product';
+
+interface Todo {
+  text: string;
   id: number;
-  title: string;
-  // Boshqa xususiyatlarni qo'shing
+  isFinished: boolean;
 }
-export const useProductsStore = defineStore('counter', {
-  state: (): { products: ProductType[] } => ({
-    products: [],
+
+
+
+export const useTodos = defineStore('todos', {
+  state: () => ({
+    isLoading: true,
+    todos: [] as Todo[],
+    products: [] as ProductType[],
+    filter: 'all' as 'all' | 'finished' | 'unfinished',
+    nextId: 0,
   }),
   getters: {
-    getProducts(): ProductType[] {
-      return this.products;
+    finishedTodos(state): Todo[] {
+      return state.todos.filter((todo) => todo.isFinished);
     },
+    unfinishedTodos(state): Todo[] {
+      return state.todos.filter((todo) => !todo.isFinished);
+    },
+    filteredTodos(state): Todo[] {
+      if (this.filter === 'finished') {
+        return this.finishedTodos;
+      } else if (this.filter === 'unfinished') {
+        return this.unfinishedTodos;
+      }
+      return this.todos;
+    },
+
+   
   },
-
   actions: {
-    async fetchProducts(): Promise<void> {
+    addTodo(text: string): void {
+      this.todos.push({ text, id: this.nextId++, isFinished: false });
+    },
+    async addProduct(product: ProductType): Promise<any> {
+
       try {
-        const response = await api.get('products');
-      console.log(response);
-      
-        // this.setProducts(data);
+        const resp = await api.post('product', product)
+        console.log(resp, "kreate resp");
+
+        if (resp.status == 200) {
+          this.isLoading = false
+          // return resp.data
+        }
       } catch (error) {
-        console.error('Error fetching products:', error);
+        console.log(error, 'error');
       }
+
+      // this.products.push(product)
     },
 
-
-    async createProduct(productData: { title: string }): Promise<void> {
+    async editProduct(product: ProductType): Promise<any> {
+      this.isLoading = true
       try {
-        const response = await api.post('products')
-        console.log(response);
+        const resp = await api.put(`product`, product)
+        console.log(resp, "edit resppppppppppppppppppppppppp");
 
-        // const createdProduct: ProductType = await response.json();
-        // this.addProduct(createdProduct);
+        if (resp.status == 200) {
+          this.isLoading = false
+          
+          // return resp.data
+        }
       } catch (error) {
-        console.error('Error creating product:', error);
+        console.log(error, 'error');
       }
+
+      // this.products.push(product)
     },
 
-    mutations: {
+    async getProduct(): Promise<any> {
 
+      try {
+        const resp = await api.get('product')
+        console.log(resp.data);
+       
 
-      setProducts(products: ProductType[]): void {
-        this.products = [];
-      },
-
-      addProduct(product: ProductType): void {
-        // this.products = [...this.products, product];
-
-        this.products = [...this.products];
-
-      },
+        if (resp.status == 200) {
+        this.products = resp.data
+          return resp.data
+        }
+      } catch (error) {
+        console.log(error, 'error');
+      }
     }
 
-  }
+  },
 });
 
 
@@ -63,48 +99,17 @@ export const useProductsStore = defineStore('counter', {
 
 
 
-// export const useProductsStore = defineStore('products', {
-//   state: ()=> ({
-//     products: [],
-//   }),
-//   actions: {
-//     async fetchProducts(): Promise<void> {
-//       try {
-//         const response = await fetch('');
-//         const data: Product[] = await response.json();
-//         this.setProducts(data);
-//       } catch (error) {
-//         console.error('Error fetching products:', error);
-//       }
-//     },
-//     async createProduct(productData: { title: string }): Promise<void> {
-//       try {
-//         const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
-//           method: 'POST',
-//           headers: {
-//             'Content-Type': 'application/json',
-//           },
-//           body: JSON.stringify(productData),
-//         });
-//         const createdProduct: Product = await response.json();
-//         this.addProduct(createdProduct);
-//       } catch (error) {
-//         console.error('Error creating product:', error);
-//       }
-//     },
-//   },
-//   getters: {
-//     getProducts(): Product[] {
-//       return this.products;
-//     },
-//   },
-//   mutations: {
-//     setProducts(products: Product[]): void {
-//       this.products = products;
-//     },
-//     addProduct(product: Product): void {
-//       this.products = [...this.products, product];
-//     },
-//   },
-// });
+
+
+
+
+
+
+
+
+
+
+
+
+
 

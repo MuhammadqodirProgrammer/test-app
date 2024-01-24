@@ -1,13 +1,24 @@
 
-
-
 <template>
   <q-btn color="primary" label="Button" @click="show" />
   <q-dialog ref="dialog" @hide="onDialogHide">
+    Lorem ipsum dolor, sit amet consectetur adipisicing elit. Laudantium, eaque?
     <q-card class="q-dialog-plugin  q-pa-lg">
 
 
-      <slot></slot>
+      <q-toolbar-title class="text-center text-h4 text-bold text-weight-bolder q-mb-sm">
+        Create modal
+      </q-toolbar-title>
+
+      <q-form @submit.prevent="onSubmit" @reset="onReset" class="q-gutter-md">
+        <q-input filled v-model="name" label="Your name *" hint="Name and surname" lazy-rules
+          :rules="[val=> val && val.length > 0 || 'Please type something']" />
+        
+        <div>
+          <q-btn label="Submit" type="submit" color="primary" @click="onOKClick" />
+          <q-btn label="Reset" type="reset" color="primary" flat class="q-ml-sm" @click="onCancelClick"  />
+        </div>
+      </q-form>
 
       <q-card-actions align="center">
         <q-btn color="primary" label="OK" @click="onOKClick" />
@@ -19,20 +30,9 @@
 
 <script>
 
-import {onMounted} from "vue"
 export default {
-  props: {
-    // onOKClick: onOKClick,
-    // show:showModal 
-        isShow: {
-            type: Boolean,
-            required: true,
-        },
-        // favoriteMoviesCount: {
-        //     type: Number,
-        //     required: true,
-        // }
-  },
+  name: 'ProductModal',
+  props: ['test'],
 
   emits: [
     // REQUIRED
@@ -53,7 +53,6 @@ export default {
     },
 
     onDialogHide() {
-      
       this.$emit('hide')
     },
 
@@ -61,18 +60,17 @@ export default {
       // on OK, it is REQUIRED to
       // emit "ok" event (with optional payload)
       // before hiding the QDialog
-      this.$emit('ok' )
+      this.$emit('ok')
       // or with payload: this.$emit('ok', { ... })
-
+console.log("send message")
       // then hiding dialog
       this.hide()
     },
 
     onCancelClick() {
-      // we just need to hide the dialog
       this.hide()
     }
-   
+
   }
 }
 </script>

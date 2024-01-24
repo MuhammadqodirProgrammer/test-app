@@ -5,10 +5,10 @@
         <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
 
         <q-toolbar-title>
-         Admin
+         Logo
         </q-toolbar-title>
 
-        <div>display width:{{ $q.screen.width }}px</div>
+        <div>Admin</div>
       </q-toolbar>
     </q-header>
 
@@ -39,9 +39,9 @@ const linksList = [
     route:  '/' 
   },
   {
-    title: 'test',
-    icon: 'settings',
-    route:  'test' 
+    title: 'Todo',
+    icon: 'menu',
+    route:  'todo' 
   },
 ];
 
