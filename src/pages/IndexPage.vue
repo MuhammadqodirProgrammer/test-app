@@ -21,7 +21,7 @@
             <th class="text-center">Delete</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody v-if="posts.length">
 
           <tr v-for="( post, inx ) in  posts " :key="post.id">
             <td class="text-left">{{ inx + 1 }}</td>
@@ -39,49 +39,101 @@
         </tbody>
       </q-markup-table>
     </div>
-    <q-toolbar-title v-if="!posts.length" class=" text-h4 text-red-3  text-center  ">
-      No Products ☹
-    </q-toolbar-title>
-    <Loading/>
+
+    <!-- Loading  -->
+    <div class="q-pa-md q-gutter-md" v-show="!posts.length">
+      <q-card class="relative-position " flat bordered>
+        <q-card-section class="q-pb-none">
+          <div class="text-h6">Get Products </div>
+        </q-card-section>
+
+        <q-card-section>
+        </q-card-section>
+
+        <q-inner-loading :showing="visible" label="Please wait..." label-class="text-teal"
+          label-style="font-size: 1.1em" />
+      </q-card>
+    </div>
+
+
+
+
+
+
+    <!-- create modal -->
+    <ProductModal :title="' Create modal'" :modalName="'create'">
+      <q-form @submit="onSubmit" class="q-gutter-md">
+        <q-input filled v-model="productNameRef" label="product name " lazy-rules
+          :rules="[(val: string) => (val && val.length) || 'Iltimos maxsulotni nomini kiriting!', (val: string) => typeof +val !== 'string' || 'Product name must be a string!']" />
+
+        <q-input filled v-model="addressRef" label="product address " lazy-rules
+          :rules="[(val: string) => (val && val.length) || 'Iltimos maxsulotni addressni kiriting!', (val: string) => typeof +val !== 'string' || 'Product name must be a string!']" />
+
+
+        <q-input filled type="number" v-model="costRef" label="Product cost" lazy-rules
+          :rules="[(val: number) => val && val > 0 || 'Iltimos maxsulotni narxini kiriting!']" />
+        <q-select filled v-model="product_typeRef" :options="options" label="select product type " option-label="name_uz"
+          option-value="id" stack-label />
+        <q-card-actions align="center">
+          <q-btn label="Submit" type="submit" color="primary" />
+          <q-btn color="negative" type="reset" label="Cancel" @click="cancelFunc" v-close-popup />
+        </q-card-actions>
+      </q-form>
+    </ProductModal>
+    
   </q-page>
 </template>
 
 <script lang="ts">
 import { Product } from 'components/models';
-
-import { defineComponent, ref, onMounted, onUpdated } from 'vue';
+import { defineComponent, ref, onMounted, } from 'vue';
 import { api } from 'src/boot/axios';
-
-// import ProductModal from '../components/ProductModal.vue';
 import { useQuasar } from 'quasar';
 import CreateDialogComponent from 'src/components/product-modal/CreateDialogComponent.vue';
 import EditDialogComponent from 'src/components/product-modal/EditDialogComponent.vue';
-import { computed } from 'vue';
 
 import { storeToRefs } from 'pinia'
-import { useTodos } from 'src/stores/products';
+import { useProduct } from 'src/stores/products';
 import ProductType from 'src/types/Product';
-import Loading from 'src/components/Loading.vue';
+import ProductModal from 'src/components/ProductModal.vue';
 
 export default defineComponent({
   name: 'IndexPage',
-  components: { CreateDialogComponent, EditDialogComponent, Loading },
+  components: { CreateDialogComponent, EditDialogComponent, ProductModal },
   emits: [
     // REQUIRED
     'ok', 'hide'
   ],
-  methods: {
-    receiveData(data: any) {
-      console.log(data, "data          --------"); // "Salom, Dunyo!"
+  data() {
+    return {
+      showDialog: false,
     }
+  },
+  methods: {
+
+
   },
   setup() {
     const $q = useQuasar()
     const posts = ref<ProductType[]>([]);
+    // product state
+    const productStore = useProduct()
+    const {  getProductTypes } = storeToRefs(productStore)
+    // loading 
+    const visible = ref(true)
+   
+    const costRef = ref('')
+    const productNameRef = ref('')
+    const product_typeRef = ref('')
+    const addressRef = ref('')
+    const options = ref([])
+    const showSimulatedReturnData = ref(false)
 
-    const todosStore = useTodos()
-    const { filter, filteredTodos } = storeToRefs(todosStore)
-
+    const data = ref('Initial data');
+    const updateData = () => {
+      alert(data.value)
+      data.value = 'Updated data';
+    };
 
 
     function confirm(id: number) {
@@ -93,7 +145,6 @@ export default defineComponent({
       }).onOk(async () => {
         try {
           const resp = await api.delete(`/product/${id}`,)
-          console.log(resp, 'resp delete');
           if (resp.status == 200) {
             alert(resp.data)
             getDataFunc()
@@ -103,39 +154,39 @@ export default defineComponent({
         }
       })
     }
-    onMounted(() => {
+    onMounted(async() => {
       getDataFunc()
 
+      const getTypes = await getProductTypes.value
+      options.value = getTypes
     })
 
     const getDataFunc = async () => {
 
-      const getAllProducts = await todosStore.getProduct()
-      const resp = (await api.get("product/get-product-types")).data
-      let newArr: any = []
-      getAllProducts.filter((product: ProductType) => {
-        resp.filter((productType: Product) => {
-          if (productType.id == product.product_type_id) {
-            newArr.push({ ...product, productType: productType.name_uz })
-          }
-        })
-        
-      })
-      console.log(newArr, "prduct");
+      const respProducts = await api.get('product')
+
+
+const resp = (await api.get('product/get-product-types')).data
+const newArr: any = []
+respProducts.data.filter((product: ProductType) => {
+  resp.filter((productType: Product) => {
+    if (productType.id == product.product_type_id) {
+      newArr.push({ ...product, productType: productType.name_uz })
+    }
+  })
+
+})
       posts.value = newArr
+
+
     }
     const postDataFunc = async (data: ProductType[]) => {
       try {
-
         const resp = await api.post('/product', data)
-        console.log(resp.data, 'resp post');
+       await productStore.addProduct(data)
         if (resp.status == 200) {
-          getDataFunc()
+         await  getDataFunc()
         }
-
-        // todosStore.addProduct(data)
-
-
       } catch (error) {
         console.log(error, 'error');
       }
@@ -144,12 +195,49 @@ export default defineComponent({
     const editChangeData = (allProduct: ProductType[]) => {
       posts.value = allProduct
     }
+
+    const onSubmit = async (evt: any) => {
+      evt.preventDefault();
+
+      const currentDate = new Date()
+      const productData = {
+        product_type_id: product_typeRef.value?.id,
+        name_uz: productNameRef.value,
+        cost: +costRef.value,
+        address: addressRef.value,
+        created_date: currentDate,
+      };
+
+    
+    const resp = await api.post('/product', productData)
+        if (resp.status == 200) {
+           getDataFunc()
+        }
+   
+
+    }
+
+
     return {
+      visible,
       posts,
       confirm,
       postDataFunc,
       getDataFunc,
-      editChangeData
+      editChangeData,
+      showSimulatedReturnData,
+      onSubmit,
+      product_typeRef,
+      productNameRef,
+      addressRef,
+      costRef,
+      updateData,
+      options,
+      showTextLoading() {
+        visible.value = false
+        showSimulatedReturnData.value = true
+      },
+
 
     };
   }

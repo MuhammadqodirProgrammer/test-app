@@ -9,13 +9,13 @@
                 <!-- <q-btn flat icon="close" v-close-popup /> -->
             </q-toolbar>
 
-
             <q-form @submit="onOKClick" class="q-gutter-md">
-                <q-input filled v-model="productName" label="product name " lazy-rules
-                    :rules="[val => (val && val.length) || 'Iltimos maxsulotni nomini kiriting!', val => typeof +val !== 'string' || 'Product name must be a string!']" />
+                <q-input filled v-model="productName" label="product name " lazy-rules :rules="[val => (val && val.length) || 'Iltimos maxsulotni nomini kiriting!',
+                val => val && (typeof +val !== 'string') || 'product name must be a string!'
+                ]" />
 
-                <q-input filled v-model="address" label="product address " lazy-rules
-                    :rules="[val => (val && val.length) || 'Iltimos maxsulotni addressni kiriting!', val => typeof +val !== 'string' || 'Product name must be a string!']" />
+                <q-input filled v-model="address" label="product address " lazy-rules :rules="[val => (val && val.length) || 'Iltimos maxsulotni addressni kiriting!',
+                val => val && (typeof +val !== 'string') || 'product name must be a string!']" />
 
 
                 <q-input filled type="number" v-model="cost" label="Product cost" lazy-rules
@@ -37,6 +37,7 @@
 
 <script>
 import { api } from 'src/boot/axios';
+
 export default {
 
     name: "CreateDialogComponent",
@@ -61,14 +62,13 @@ export default {
             const data = {
                 product_type_id: this.product_type.id,
                 name_uz: this.productName,
-                cost: this.cost,
+                cost: +this.cost,
                 address: this.address,
                 created_date: currentDate
             }
-            // (this.product_type  && this.cost && this.address) ? this.showDialog = false : alert("Please enter value all inputs")
+            console.log(data, "data");
             this.showDialog = false
             this.$emit('sendDataEvent', data);
-
 
         },
         cancelFunc() {

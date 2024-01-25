@@ -23,8 +23,7 @@ export default defineComponent({
     },
 
     route: {
-      type: Object,
-      // eslint-disable-next-line vue/require-valid-default-prop
+      type: String,
       default: ''
     },
 
