@@ -15,7 +15,7 @@
             <th class="text-center">Product Name</th>
             <th class="text-center">Cost</th>
             <th class="text-center">Adress</th>
-            <th class="text-center">product_type_id</th>
+            <th class="text-center">Product Type</th>
             <th class="text-center">Created Date</th>
             <th class="text-center">Edit</th>
             <th class="text-center">Delete</th>
