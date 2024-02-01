@@ -6,17 +6,13 @@ const routes: RouteRecordRaw[] = [
     children: [
       {
         path: '',
-        component: () => import('pages/IndexPage.vue')
+        component: () => import('pages/NewCrud.vue')
+      },
+      {
+        path: '/todo',
+        component: () => import('pages/Todo.vue')
       },
 
-      {
-         path: '/todo',
-         component: () => import('pages/Todo.vue')
-      },
-      {
-        path: '/newcrud',
-        component: () => import('pages/NewCrud.vue')
-     }
     ],
   },
 

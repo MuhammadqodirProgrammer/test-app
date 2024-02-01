@@ -77,7 +77,7 @@
 
         <!-- Pagination -->
         <div class="q-gutter-md">
-            <q-pagination v-model="current" :max="Math.ceil(products.length / 6)" direction-links push color="teal"
+            <q-pagination v-model="current" :max="Math.ceil(products.length / 6)" direction-links push color="primary"
                 active-design="push" active-color="orange" />
         </div>
 
