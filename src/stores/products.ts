@@ -20,8 +20,6 @@ export const useProduct = defineStore('todos', {
 
     async getterFunc(state) {
       const respProducts = await api.get('product')
-
-
       const resp = (await api.get('product/get-product-types')).data
       const newArr: any = []
       respProducts.data.filter((product: ProductType) => {
@@ -71,17 +69,13 @@ export const useProduct = defineStore('todos', {
       this.isLoading = true
       try {
         const resp = await api.put(`product`, product)
-        console.log(resp, 'edit resppppppppppppppppppppppppp');
-
         if (resp.status == 200) {
           this.isLoading = false
-
           return resp.data
         }
       } catch (error) {
         console.log(error, 'error');
       }
-
       // this.products.push(product)
     },
 

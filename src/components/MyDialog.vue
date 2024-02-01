@@ -8,9 +8,7 @@
         </q-toolbar-title>
         <q-btn icon="close" flat @click="closeModal" />
       </q-toolbar>
-
       <slot></slot>
-
     </q-card>
 
   </q-dialog>
@@ -19,8 +17,6 @@
 <script lang="ts">
 import {
   defineComponent,
-  ref,
-
 } from 'vue';
 import { useDialogStore } from "../stores/modal"
 
@@ -37,15 +33,10 @@ export default defineComponent({
   setup(props) {
     const myDialog = useDialogStore();
 
-    const test = ref(true)
-    console.log(test.value, "testing");
-    console.log(myDialog.$state.isOpen, "myDialog.$state.isOpen tttttttttttttttt");
-
     const closeModal = () => {
       myDialog.$state.isOpen = !myDialog.$state.isOpen
     }
-
-    return { ...props, closeModal, myDialog, test };
+    return { ...props, closeModal, myDialog };
   },
 });
 </script>
