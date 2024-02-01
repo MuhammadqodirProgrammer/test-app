@@ -7,7 +7,7 @@
             <q-toolbar-title>
                 Products
             </q-toolbar-title>
-            <q-btn label="create" color="primary" @click="openModal('create')" />
+            <q-btn label="create" color="primary" @click="toggleModal('create')" />
         </q-toolbar>
 
         <!-- Loading  -->
@@ -31,7 +31,8 @@
             <q-card style="max-width: 33%; min-width: 300px;" class="shadow-10 q-my-lg " v-for=" product of someProducts "
                 v-bind:key="product.id">
                 <q-card-section>
-                    <q-img :src= "`https://picsum.photos/300/200?random=${product.id}}` " loading="lazy" spinner-color="orange">
+                    <q-img :src="`https://picsum.photos/300/200?random=${product.id}}`" loading="lazy"
+                        spinner-color="orange">
 
                         <q-chip color="orange" text-color="white" class="absolute absolute-bottom-right " icon-right="">
                             {{ product.cost }}$
@@ -76,7 +77,7 @@
 
 
         <!-- Pagination -->
-        <div class="q-gutter-md">
+        <div class="q-gutter-md" v-show="products.length > 6">
             <q-pagination v-model="current" :max="Math.ceil(products.length / 6)" direction-links push color="primary"
                 active-design="push" active-color="orange" />
         </div>
@@ -125,7 +126,7 @@
                         option-label="name_uz" option-value="id" stack-label />
                     <q-card-actions align="center">
                         <q-btn label="Submit" type="submit" color="primary" />
-                        <q-btn color="negative" type="reset" label="Cancel" @click="editCancelFunc" />
+                        <q-btn color="negative" type="reset" label="Cancel" @click="toggleModal('edit')" />
                     </q-card-actions>
                 </q-form>
             </q-card-section>
@@ -145,7 +146,7 @@
 
                     <q-card-actions align="center">
                         <q-btn label="Submit" type="submit" color="primary" />
-                        <q-btn color="negative" type="reset" label="Cancel" @click="openModal('delete')" />
+                        <q-btn color="negative" type="reset" label="Cancel" @click="toggleModal('delete')" />
                     </q-card-actions>
                 </q-form>
             </q-card-section>
@@ -156,7 +157,6 @@
   
 <script lang="ts">
 import { api } from 'src/boot/axios';
-import { Product } from 'src/components/models';
 import MyDialog from 'src/components/MyDialog.vue';
 import { useProduct } from 'src/stores/products';
 import ProductType from 'src/types/Product';
@@ -170,9 +170,7 @@ export default defineComponent({
     setup() {
 
         onMounted(async () => {
-
             getProductFunc()
-            // getProductTest(1)
             const getTypes = await getProductTypes.value
             options.value = getTypes
         })
@@ -213,13 +211,13 @@ export default defineComponent({
             someProducts.value = products.value.slice((newCurrent * 6 - 6), 6 * newCurrent)
         })
 
-
-
-        const openModal = (modalName: string) => {
+        //toggle  Modal function
+        const toggleModal = (modalName: string) => {
             isActiveModal.value = modalName
             myDialog.$state.isOpen ? myDialog.$state.isOpen = false : myDialog.$state.isOpen = true
         }
 
+        // getter Functions
         const getProductFunc = async () => {
             const respProducts = await api.get('product').catch(test => {
                 if (test.code == 'ERR_NETWORK') {
@@ -240,26 +238,17 @@ export default defineComponent({
             someProducts.value = products.value.slice((current.value * 6 - 6), 6 * current.value)
 
         }
+        const getOneProduct = async (product: ProductType) => {
+            editCostRef.value = product.cost;
+            editProductNameRef.value = product.name_uz;
+            editProduct_typeRef.value = product.productType;
+            editAddressRef.value = product.address;
+            toggleModal('edit')
+            productOne.value = product
 
-        // const getProductTest = async (page:number) => {
-        //     const respProducts = await api.get(`product?page=${page}&perPage=6`).catch(test => {
-        //         if (test.code == 'ERR_NETWORK') {
-        //             networkErr.value = true
-        //         }
-        //     })
 
-        //     const resp = (await api.get('product/get-product-types')).data
-        //     const newArr: any = []
-        //     respProducts?.data?.filter((product: ProductType) => {
-        //         resp.filter((productType: Product) => {
-        //             if (productType.id == product.product_type_id) {
-        //                 newArr.push({ ...product, productType: productType.name_uz })
-        //             }
-        //         })
-
-        //     })
-        //     products.value = newArr.length ? newArr : respProducts?.data
-        // }
+        }
+        //  notification function
         const notifyFunc = (color: string, message: string, icon: string) => {
             $q.notify({
                 message: message,
@@ -270,6 +259,7 @@ export default defineComponent({
             })
         }
 
+        // create Functions
         const createProductFunc = async () => {
             const currentDate = new Date()
             const data = {
@@ -282,13 +272,13 @@ export default defineComponent({
 
             const resp = await api.post('/product', data)
             if (resp.status == 200) {
-                openModal('create')
+                toggleModal('create')
                 getProductFunc()
                 notifyFunc('positive', 'Succesfully created', 'check')
 
             }
         }
-
+        // edit Functions
         const editProductFunc = async () => {
             const data = {
                 id: productOne.value.id,
@@ -301,29 +291,20 @@ export default defineComponent({
             const resp = await api.put('/product', data)
             console.log(resp, 'created_dateа')
             if (resp.status == 200) {
-                openModal('edit')
+                toggleModal('edit')
                 getProductFunc()
                 notifyFunc('positive', 'Succesfully edited', 'check')
 
             }
         }
-
         const cancelFunc = () => {
             myDialog.$state.isOpen = false
             costRef.value = ''; productNameRef.value = ''; product_typeRef.value = ''; addressRef.value = '';
         }
-        const getOneProduct = async (product: ProductType) => {
-            editCostRef.value = product.cost;
-            editProductNameRef.value = product.name_uz;
-            editProduct_typeRef.value = product.productType;
-            editAddressRef.value = product.address;
-            openModal('edit')
-            productOne.value = product
 
-
-        }
+        // delete Functions
         const deleteModalFunc = (product: ProductType) => {
-            openModal('delete')
+            toggleModal('delete')
             productOne.value = product
         }
         const deleteProduct = async () => {
@@ -331,27 +312,25 @@ export default defineComponent({
             console.log(resp.data, "delete");
             if (resp.status == 200) {
                 getProductFunc()
-                openModal('delete');
+                toggleModal('delete');
                 notifyFunc('negative', 'Succesfully deleted', 'delete')
             }
 
         }
 
 
-        const editCancelFunc = () => myDialog.$state.isOpen = false
+
 
 
         return {
             isActiveModal,
-            openModal,
+            toggleModal,
             options,
             productOne, someProducts,
             products, current,
             costRef, productNameRef, product_typeRef, addressRef, networkErr,
             editCostRef, editProductNameRef, editProduct_typeRef, editAddressRef,
-            editCancelFunc,
             createProductFunc, cancelFunc, editProductFunc, getOneProduct, deleteModalFunc, deleteProduct,
-randomImg:`https://picsum.photos/300/200?random=${Math.floor(Math.random())}`
 
         };
     }
