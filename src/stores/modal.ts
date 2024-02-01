@@ -1,24 +1,15 @@
 import { defineStore } from 'pinia';
-import { api } from 'src/boot/axios';
 
 
-export const useModal = defineStore('modal', {
+export const useDialogStore = defineStore('modal', {
   state: () => ({
-    isLoading: true,
-    isOpen:true,
-    filter: 'all' as 'all' | 'finished' | 'unfinished',
+    isOpen:false,
   }),
   getters: {
-    finishedTodos(state):Boolean {
-      return state.isOpen
-    },
-  
-
-   
   },
   actions: {
     changeState(text: string): void {
-     this.$state.isOpen =!this.$state.isOpen
+     this.$state.isOpen =this.$state.isOpen ? false :true
     },
 
   },

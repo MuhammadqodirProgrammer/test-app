@@ -1,5 +1,5 @@
 interface ProductType {
-  id: number,
+  id?: number,
   product_type_id: number,
   name_uz: string,
   cost: number,

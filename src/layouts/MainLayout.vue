@@ -43,7 +43,13 @@ const linksList = [
     icon: 'menu',
     route:  'todo' 
   },
+  {
+    title: 'NewCrud',
+    icon: 'code',
+    route:  'newcrud' 
+  },
 ];
+
 
 export default defineComponent({
   name: 'MainLayout',

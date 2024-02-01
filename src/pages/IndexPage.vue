@@ -76,11 +76,11 @@
           option-value="id" stack-label />
         <q-card-actions align="center">
           <q-btn label="Submit" type="submit" color="primary" />
-          <q-btn color="negative" type="reset" label="Cancel" @click="cancelFunc" v-close-popup />
+          <q-btn color="negative" type="reset" label="Cancel" v-close-popup />
         </q-card-actions>
       </q-form>
     </ProductModal>
-    
+
   </q-page>
 </template>
 
@@ -118,10 +118,10 @@ export default defineComponent({
     const posts = ref<ProductType[]>([]);
     // product state
     const productStore = useProduct()
-    const {  getProductTypes } = storeToRefs(productStore)
+    const { getProductTypes } = storeToRefs(productStore)
     // loading 
     const visible = ref(true)
-   
+
     const costRef = ref('')
     const productNameRef = ref('')
     const product_typeRef = ref('')
@@ -154,7 +154,7 @@ export default defineComponent({
         }
       })
     }
-    onMounted(async() => {
+    onMounted(async () => {
       getDataFunc()
 
       const getTypes = await getProductTypes.value
@@ -166,16 +166,16 @@ export default defineComponent({
       const respProducts = await api.get('product')
 
 
-const resp = (await api.get('product/get-product-types')).data
-const newArr: any = []
-respProducts.data.filter((product: ProductType) => {
-  resp.filter((productType: Product) => {
-    if (productType.id == product.product_type_id) {
-      newArr.push({ ...product, productType: productType.name_uz })
-    }
-  })
+      const resp = (await api.get('product/get-product-types')).data
+      const newArr: any = []
+      respProducts.data.filter((product: ProductType) => {
+        resp.filter((productType: Product) => {
+          if (productType.id == product.product_type_id) {
+            newArr.push({ ...product, productType: productType.name_uz })
+          }
+        })
 
-})
+      })
       posts.value = newArr
 
 
@@ -183,9 +183,9 @@ respProducts.data.filter((product: ProductType) => {
     const postDataFunc = async (data: ProductType[]) => {
       try {
         const resp = await api.post('/product', data)
-       await productStore.addProduct(data)
+        await productStore.addProduct(data)
         if (resp.status == 200) {
-         await  getDataFunc()
+          await getDataFunc()
         }
       } catch (error) {
         console.log(error, 'error');
@@ -208,12 +208,12 @@ respProducts.data.filter((product: ProductType) => {
         created_date: currentDate,
       };
 
-    
-    const resp = await api.post('/product', productData)
-        if (resp.status == 200) {
-           getDataFunc()
-        }
-   
+
+      const resp = await api.post('/product', productData)
+      if (resp.status == 200) {
+        getDataFunc()
+      }
+
 
     }
 
