@@ -25,7 +25,7 @@
                     label-class="text-teal" label-style="font-size: 1.1em" />
             </q-card>
         </div>
-
+        <!-- render Data -->
         <div class="flex  justify-between q-px-md">
 
             <q-card style="max-width: 33%; min-width: 300px;" class="shadow-10 q-my-lg " v-for=" product of someProducts "
@@ -107,6 +107,7 @@
                 </q-form>
             </q-card-section>
         </MyDialog>
+        
         <!-- edit modal  -->
         <MyDialog v-if="isActiveModal == 'edit'" :title="'Edit Modal'">
             <q-card-section>
@@ -317,9 +318,6 @@ export default defineComponent({
             }
 
         }
-
-
-
 
 
         return {
